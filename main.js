@@ -3,6 +3,7 @@ import { HttpsProxyAgent } from "https-proxy-agent";
 import fs from "fs";
 import path from "path";
 import { exec } from "child_process";
+import moment from 'moment-timezone'
 
 const url = process.env.DOMAIN;
 const email = process.env.EMAIL;
@@ -40,9 +41,10 @@ const wxSend = async (content) => {
 };
 
 const saveLog = (content) => {
-  const dateTime = new Date().toISOString(); // 获取当前时间
+  moment.tz.setDefault("Asia/Shanghai");
+  const dateTime = moment(new Date()).tz('Asia/Shanghai').format('YYYY-MM-DD h:m:s')
 
-  const __dirname = path.resolve(path.dirname(''));
+  const __dirname = path.resolve(path.dirname(""));
   // 日志文件路径
   const logFilePath = path.join(__dirname, "run.log");
 
@@ -51,10 +53,10 @@ const saveLog = (content) => {
 
   fs.appendFile(logFilePath, logContent, (err) => {
     if (err) {
-      console.error('写入日志失败:', err);
+      console.error("写入日志失败:", err);
       return;
     }
-  
+
     // 成功写入日志后，读取并输出最后几行日志
     exec(`tail -n 1 ${logFilePath}`, (error, stdout, stderr) => {
       if (error) {
@@ -65,8 +67,8 @@ const saveLog = (content) => {
         console.error(`stderr: ${stderr}`);
         return;
       }
-  
-      console.log('最新的日志内容:\n', stdout);
+
+      console.log("最新的日志内容:\n", stdout);
     });
   });
 };
