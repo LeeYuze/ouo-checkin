@@ -1,0 +1,10 @@
+{
+  "type": "module",
+  "scripts": {
+    "main": "node main.js"
+  },
+  "dependencies": {
+    "https-proxy-agent": "^7.0.6",
+    "node-fetch": "^3.3.2"
+  }
+}

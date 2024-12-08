@@ -1,0 +1,43 @@
+name: 'ouo Checkin Action'
+
+on: 
+  release:
+    types: [published]
+  push:
+    tags:
+    - 'v*'
+  schedule:
+    - cron: '0 16 * * *'
+  watch:
+    types: [started]
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id || github.event_name == 'schedule'
+    steps:
+      - name: Setup timezone
+        uses: zcong1993/setup-timezone@master
+        with:
+          timezone: Asia/Shanghai
+      - name: Get log
+        uses: actions/checkout@master
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 21
+      - run: npm ci
+      - run: npm run main
+        env:
+          DOMAIN: https://dashboard.ouonet.work
+          EMAIL: ${{ secrets.EMAIL }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          SENDKEY: ${{ secrets.SENDKEY }}
+      - name: Commit #上传日志到仓库，可以自行修改 name 和 email
+        run: |
+          git add .
+          git commit -m "update log" -a
+      - name: Push log
+          uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUBTOKEN }}
