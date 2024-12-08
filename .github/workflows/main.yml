@@ -35,6 +35,8 @@ jobs:
           SENDKEY: ${{ secrets.SENDKEY }}
       - name: Commit #上传日志到仓库，可以自行修改 name 和 email
         run: |
+          git config --global user.name "LeeYuze"
+          git config --global user.email "qw110288qw@vip.qq.com"
           git add .
           git commit -m "update log" -a
       - name: Push log
