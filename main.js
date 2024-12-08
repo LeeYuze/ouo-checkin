@@ -3,7 +3,7 @@ import { HttpsProxyAgent } from "https-proxy-agent";
 import fs from "fs";
 import path from "path";
 import { exec } from "child_process";
-import moment from 'moment-timezone'
+import moment from "moment-timezone";
 
 const url = process.env.DOMAIN;
 const email = process.env.EMAIL;
@@ -42,33 +42,36 @@ const wxSend = async (content) => {
 
 const saveLog = (content) => {
   moment.tz.setDefault("Asia/Shanghai");
-  const dateTime = moment(new Date()).tz('Asia/Shanghai').format('YYYY-MM-DD h:m:s')
+  const dateTime = moment(new Date())
+    .tz("Asia/Shanghai")
+    .format("YYYY-MM-DD h:m:s");
 
   const __dirname = path.resolve(path.dirname(""));
   // 日志文件路径
-  const logFilePath = path.join(__dirname, "run.log");
+  const filePath = path.join(__dirname, "run.log");
 
   // 写入日志内容到文件
   const logContent = `${dateTime} - ${content}\n`;
 
-  fs.appendFile(logFilePath, logContent, (err) => {
+  // 读取文件内容
+  fs.readFile(filePath, "utf8", (err, data) => {
     if (err) {
-      console.error("写入日志失败:", err);
+      console.error("Error reading file:", err);
       return;
     }
 
-    // 成功写入日志后，读取并输出最后几行日志
-    exec(`tail -n 1 ${logFilePath}`, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`执行命令时出错: ${error.message}`);
-        return;
-      }
-      if (stderr) {
-        console.error(`stderr: ${stderr}`);
-        return;
-      }
+    // 将插入内容与原文件内容合并
+    const updatedContent = logContent + data;
 
-      console.log("最新的日志内容:\n", stdout);
+    // 将更新后的内容写回文件
+    fs.writeFile(filePath, updatedContent, "utf8", (err) => {
+      if (err) {
+        console.error("Error writing file:", err);
+      } else {
+        console.log(
+          "Content successfully inserted at the beginning of the file."
+        );
+      }
     });
   });
 };
