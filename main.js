@@ -79,8 +79,9 @@ const saveLog = (content) => {
 const main = async () => {
   const resp = await login();
   const checkResp = await checkout(resp.data.auth_data);
-  wxSend(checkResp);
-  saveLog(checkResp);
+  const content = JSON.stringify(checkResp);
+  wxSend(content);
+  saveLog(content);
 };
 
 main();
